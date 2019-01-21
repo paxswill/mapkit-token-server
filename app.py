@@ -23,13 +23,20 @@ def create_token(key_id, team_id, key, origin=None, expiration=None):
         claims['exp'] = now + expiration
     token = jwt.encode(claims, key, algorithm='ES256', headers=headers)
     log.debug("Created token %s with claims %s", token, claims)
-    return aiohttp.web.Response(text=token)
+    return token
 
 
 @routes.view('/mapkit_token', name='generate_token')
 def new_token(request):
     token = create_token(**request.app['config'])
-    return token
+    headers = {}
+    if 'origin' in request.app['config']:
+        origin = request.app['config']['origin']
+        headers['Access-Control-Allow-Origin'] = origin
+    else:
+        headers['Access-Control-Allow-Origin'] = '*'
+
+    return aiohttp.web.Response(text=token, headers=headers)
 
 
 def read_config():
