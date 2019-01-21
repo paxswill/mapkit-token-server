@@ -1,0 +1,43 @@
+version: "3.6"
+services:
+  mapkit_token:
+    image: trail-photos/mapkit_token:latest
+    build:
+      context: ${BASE_DIR:-.}
+      dockerfile: ${BASE_DIR:-.}/mapkit_token/Dockerfile
+    networks:
+      gateway:
+        aliases:
+          - mapkit-gateway
+    ports:
+      - 80
+    environment:
+      # 5 minute token expiration
+      MAPKIT_TOKEN_EXPIRATION: 300
+      MAPKIT_TOKEN_ORIGIN_FILE: /run/secrets/root_url
+      MAPKIT_TEAM_ID_FILE: /run/secrets/team_id
+      MAPKIT_KEY_ID_FILE: /run/secrets/key_id
+      MAPKIT_KEY_FILE: /run/secrets/mapkit_private_key
+      GATEWAY_SUBNET: "${GATEWAY_SUBNET:-192.168.20.0/24}"
+    secrets:
+      - mapkit_private_key
+      - root_url
+      - source: mapkit_key_id
+        target: /run/secrets/key_id
+      - source: mapkit_team_id
+        target: /run/secrets/team_id
+  nginx:
+    secrets:
+      - source: mapkit-nginx-config
+        target: /sites/mapkit.conf
+secrets:
+  mapkit_private_key:
+    file: ${SECRETS_DIR:-./admin/secrets}/mapkit.p8
+  mapkit_key_id:
+    file: ${SECRETS_DIR:-./admin/secrets}/mapkit_key_id
+  mapkit_team_id:
+    file: ${SECRETS_DIR:-./admin/secrets}/mapkit_team_id
+  mapkit-nginx-config:
+    file: ${BASE_DIR:-.}/mapkit_token/nginx.conf
+  root_url:
+    file: ${SECRETS_DIR:-./admin/secrets}/root_url
