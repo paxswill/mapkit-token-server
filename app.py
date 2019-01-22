@@ -70,8 +70,11 @@ def read_config():
                     )
     # Convert the input to a timedelta
     if 'expiration' in config:
-        seconds = int(config['expiration'])
-        config['expiration'] = datetime.timedelta(seconds=seconds)
+        if config['expiration'] == '':
+            del config['expiration']
+        else:
+            seconds = int(config['expiration'])
+            config['expiration'] = datetime.timedelta(seconds=seconds)
     try:
         key_path = os.environ['MAPKIT_KEY_FILE']
         key_data = pathlib.Path(key_path).read_text()
@@ -83,6 +86,8 @@ def read_config():
     assert 'team_id' in config
     assert 'key_id' in config
     assert 'key' in config
+    if config['origin'] == '':
+        del config['origin']
     return config
 
 
