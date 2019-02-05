@@ -86,7 +86,7 @@ def read_config():
     assert 'team_id' in config
     assert 'key_id' in config
     assert 'key' in config
-    if config['origin'] == '':
+    if 'origin' in config and config['origin'] == '':
         del config['origin']
     return config
 
