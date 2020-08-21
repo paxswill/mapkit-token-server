@@ -25,6 +25,10 @@ else:
     raise Exception(f"Unable to find __version__ in {src_dir}/__init__.py")
 
 
+with open(os.path.join(setup_dir, "requirements.txt"), "r") as f:
+    requirements = list(f.readlines())
+
+
 setup(
     name="mapkit-token-server",
     version=version,
@@ -34,11 +38,7 @@ setup(
     license="BSD",
     url="https://github.com/paxswill/mapkit-token-server",
     packages=find_packages(),
-    install_requires=[
-        "aiohttp == 3.5.4",
-        "python-jose == 3.0.1",
-        "ecdsa == 0.13",
-    ],
+    install_requires=requirements,
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: BSD License",
